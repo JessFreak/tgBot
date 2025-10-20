@@ -1,9 +1,11 @@
+import { generateContent } from './generateContent.js';
+
 export const studentHandler = async (ctx) => {
   const studentInfo = `**Студент:** Малий Олександр Сергійович\n**Група:** ІП-24`;
   await ctx.reply(studentInfo, {
     parse_mode: 'Markdown',
   });
-}
+};
 
 export const technologyHandler = async (ctx) => {
   const itInfo = `🌐 **Огляд IT-технологій (Web-розробка):**
@@ -22,7 +24,7 @@ export const technologyHandler = async (ctx) => {
   await ctx.reply(itInfo, {
     parse_mode: 'Markdown',
   });
-}
+};
 
 export const contactsHandler = async (ctx) => {
   const safeUsername = '@freakman\\_s';
@@ -36,17 +38,46 @@ export const contactsHandler = async (ctx) => {
   await ctx.reply(contactsInfo, {
     parse_mode: 'Markdown',
   });
-}
+};
 
 export const promptHandler = async (ctx) => {
-  const promptInfo = `💡 **Інформація про Промпт (Prompt):**
-Промпт - це вхідний текст або інструкція, яку ви надаєте штучному інтелекту (наприклад, ChatGPT, Gemini, Midjourney), щоб отримати бажаний результат. 
-
-**Приклад вдалого промпту:**
-*«Створи 5 ідей для стартапу на основі технології блокчейн, орієнтованих на ринок України. Відповідь подай у вигляді маркованого списку.»*
-    `;
-
+  const promptInfo = `💡 **Я готовий!** Просто напишіть мені своє запитання або промпт (наприклад, "Напиши вірш про кота").`;
   await ctx.reply(promptInfo, {
     parse_mode: 'Markdown',
   });
-}
+};
+
+export const geminiHandler = async (ctx) => {
+  const userPrompt = ctx.message.text;
+  const chatId = ctx.message.chat.id;
+
+  let loadingMessage;
+  try {
+    loadingMessage = await ctx.reply('⌛️ Обробляю ваш запит через Gemini...', { parse_mode: 'Markdown' });
+
+    const responseText = await generateContent(userPrompt);
+
+    await ctx.telegram.editMessageText(
+      chatId,
+      loadingMessage.message_id,
+      null,
+      responseText,
+      { parse_mode: 'Markdown' },
+    );
+
+  } catch (error) {
+    console.error('Помилка в обробнику Gemini:', error);
+    const errorMessage = ` Виникла помилка: ${error.message}. Перевірте ваш GEMINI_API_KEY.`;
+
+    if (loadingMessage) {
+      await ctx.telegram.editMessageText(
+        chatId,
+        loadingMessage.message_id,
+        null,
+        errorMessage,
+      );
+    } else {
+      await ctx.reply(errorMessage);
+    }
+  }
+};

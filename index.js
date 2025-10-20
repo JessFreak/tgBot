@@ -1,7 +1,7 @@
 import { Telegraf } from 'telegraf';
 import { message } from 'telegraf/filters';
 import 'dotenv/config';
-import { contactsHandler, promptHandler, studentHandler, technologyHandler } from './handlers.js';
+import { contactsHandler, geminiHandler, promptHandler, studentHandler, technologyHandler } from './handlers.js';
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
@@ -30,13 +30,7 @@ bot.hears('Контакти', contactsHandler);
 
 bot.hears('Промпт', promptHandler);
 
-bot.on(message('text'), async (ctx) => {
-  const answer = `Я не зрозумів команду **${ctx.message.text}**. Будь ласка, оберіть опцію на клавіатурі.`;
-  await ctx.reply(answer, {
-    ...keyboard,
-    parse_mode: 'Markdown',
-  });
-});
+bot.on(message('text'), geminiHandler);
 
 bot.launch();
 
