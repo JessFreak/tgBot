@@ -1,9 +1,19 @@
+import http from 'http';
 import { Telegraf } from 'telegraf';
 import { message } from 'telegraf/filters';
 import 'dotenv/config';
 import { contactsHandler, geminiHandler, promptHandler, studentHandler, technologyHandler } from './handlers.js';
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
+
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('Bot is running!');
+});
+const PORT = 8080;
+server.listen(PORT, () => {
+  console.log(`Server started on port ${PORT}`);
+});
 
 const keyboard = {
   reply_markup: {
